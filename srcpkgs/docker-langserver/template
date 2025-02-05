@@ -1,0 +1,34 @@
+# Template file for 'docker-langserver'
+pkgname=docker-langserver
+version=0.0.24
+revision=1
+hostmakedepends="nodejs yarn"
+depends="nodejs"
+short_desc="Docker Language Server"
+maintainer="toomyem <toomyem@gmail.com>"
+license="MIT"
+homepage="https://github.com/rcjsuen/dockerfile-language-server"
+distfiles="https://github.com/rcjsuen/dockerfile-language-server/archive/refs/tags/v${version}.tar.gz"
+checksum=f79efb3b226f052cf01b83a710fb500f7c15fa7a8768495a3a16ab27bf777dfb
+
+do_build() {
+        npm install
+        npm run build
+        rm -r node_modules
+        npm install --omit=dev --ignore-scripts
+        chmod +x bin/docker-langserver
+}
+
+do_install() {
+        vlicense License.txt
+
+        vmkdir usr/bin
+        vmkdir usr/lib/docker-langserver
+        vcopy bin/ usr/lib/docker-langserver
+        vcopy lib/ usr/lib/docker-langserver
+        vcopy node_modules/ usr/lib/docker-langserver
+
+        ln -sf /usr/lib/docker-langserver/bin/docker-langserver \
+                ${DESTDIR}/usr/bin/docker-langserver
+}
+
